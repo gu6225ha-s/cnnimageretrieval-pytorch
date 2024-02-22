@@ -3,6 +3,7 @@ import os
 import time
 import pickle
 import pdb
+from pathlib import Path
 
 import numpy as np
 
@@ -61,6 +62,10 @@ parser.add_argument('--whitening', '-w', metavar='WHITENING', default=None, choi
 # GPU ID
 parser.add_argument('--gpu-id', '-g', default='0', metavar='N',
                     help="gpu id used for testing (default: '0')")
+
+# CSA data preparation
+parser.add_argument('--csa-output-dir', '-csaout', type=Path,
+                    help="Output directory for CSA training data")
 
 def main():
     args = parser.parse_args()
@@ -243,6 +248,14 @@ def main():
         # convert to numpy
         vecs = vecs.numpy()
         qvecs = qvecs.numpy()
+
+        # Save CSA training data
+        if args.csa_output_dir:
+            print('>> {}: Saving CSA training data...'.format(dataset))
+            data = {"db": vecs.T, "query": qvecs.T}
+            output_path = args.csa_output_dir / dataset / f"{args.network_path}.pkl"
+            with open(output_path, "wb") as f:
+                pickle.dump(data, f)
 
         # search, rank, and print
         scores = np.dot(vecs.T, qvecs)
