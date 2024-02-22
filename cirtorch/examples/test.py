@@ -241,6 +241,7 @@ def main():
             print('>> {}: Saving CSA training data...'.format(dataset))
             data = {"train": vecs.T}
             output_path = args.csa_output_dir / dataset / f"{args.network_path}.pkl"
+            output_path.parent.mkdir(exist_ok=True, parents=True)
             with open(output_path, "wb") as f:
                 pickle.dump(data, f)
 
@@ -272,6 +273,7 @@ def main():
             print('>> {}: Saving CSA training data...'.format(dataset))
             data = {"db": vecs.T, "query": qvecs.T}
             output_path = args.csa_output_dir / dataset / f"{args.network_path}.pkl"
+            output_path.parent.mkdir(exist_ok=True, parents=True)
             with open(output_path, "wb") as f:
                 pickle.dump(data, f)
 
