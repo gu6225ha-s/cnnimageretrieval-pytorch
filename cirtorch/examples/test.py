@@ -31,7 +31,7 @@ PRETRAINED = {
     'gl18-tl-resnet152-gem-w'           : 'http://cmp.felk.cvut.cz/cnnimageretrieval/data/networks/gl18/gl18-tl-resnet152-gem-w-21278d5.pth',
 }
 
-datasets_names = ['oxford5k', 'paris6k', 'roxford5k', 'rparis6k']
+datasets_names = ['oxford5k', 'paris6k', 'roxford5k', 'rparis6k', 'rsfm120k']
 whitening_names = ['retrieval-SfM-30k', 'retrieval-SfM-120k']
 
 parser = argparse.ArgumentParser(description='PyTorch CNN Image Retrieval Testing')
@@ -227,6 +227,24 @@ def main():
         start = time.time()
 
         print('>> {}: Extracting...'.format(dataset))
+
+        if dataset == 'rsfm120k':
+            db_root = os.path.join(get_data_root(), 'train', 'retrieval-SfM-120k')
+            ims_root = os.path.join(db_root, 'ims')
+            with open(os.path.join(db_root, 'retrieval-SfM-120k.pkl'), 'rb') as f:
+                db = pickle.load(f)
+            images = [cid2filename(cid, ims_root) for cid in db['train']['cids']]
+
+            print('>> {}: train images...'.format(dataset))
+            vecs = extract_vectors(net, images, args.image_size, transform, ms=ms, msp=msp)
+
+            print('>> {}: Saving CSA training data...'.format(dataset))
+            data = {"train": vecs.T}
+            output_path = args.csa_output_dir / dataset / f"{args.network_path}.pkl"
+            with open(output_path, "wb") as f:
+                pickle.dump(data, f)
+
+            continue
 
         # prepare config structure for the test dataset
         cfg = configdataset(dataset, os.path.join(get_data_root(), 'test'))
