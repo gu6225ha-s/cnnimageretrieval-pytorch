@@ -239,7 +239,7 @@ def main():
             vecs = extract_vectors(net, images, args.image_size, transform, ms=ms, msp=msp)
 
             print('>> {}: Saving CSA training data...'.format(dataset))
-            data = {"train": vecs.T}
+            data = {"train": vecs.T.numpy()}
             output_path = args.csa_output_dir / dataset / f"{args.network_path}.pkl"
             output_path.parent.mkdir(exist_ok=True, parents=True)
             with open(output_path, "wb") as f:
@@ -271,7 +271,7 @@ def main():
         # Save CSA training data
         if args.csa_output_dir:
             print('>> {}: Saving CSA training data...'.format(dataset))
-            data = {"db": vecs.T, "query": qvecs.T}
+            data = {"db": vecs.T.numpy(), "query": qvecs.T.numpy()}
             output_path = args.csa_output_dir / dataset / f"{args.network_path}.pkl"
             output_path.parent.mkdir(exist_ok=True, parents=True)
             with open(output_path, "wb") as f:
