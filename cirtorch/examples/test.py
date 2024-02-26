@@ -233,13 +233,17 @@ def main():
             ims_root = os.path.join(db_root, 'ims')
             with open(os.path.join(db_root, 'retrieval-SfM-120k.pkl'), 'rb') as f:
                 db = pickle.load(f)
-            images = [cid2filename(cid, ims_root) for cid in db['train']['cids']]
 
             print('>> {}: train images...'.format(dataset))
-            vecs = extract_vectors(net, images, args.image_size, transform, ms=ms, msp=msp)
+            images = [cid2filename(cid, ims_root) for cid in db['train']['cids']]
+            tvecs = extract_vectors(net, images, args.image_size, transform, ms=ms, msp=msp)
+
+            print('>> {}: val images...'.format(dataset))
+            images = [cid2filename(cid, ims_root) for cid in db['val']['cids']]
+            vvecs = extract_vectors(net, images, args.image_size, transform, ms=ms, msp=msp)
 
             print('>> {}: Saving CSA training data...'.format(dataset))
-            data = {"train": vecs.T.numpy()}
+            data = {"train": tvecs.T.numpy(), "val": vvecs.T.numpy()}
             output_path = args.csa_output_dir / dataset / f"{args.network_path}.pkl"
             output_path.parent.mkdir(exist_ok=True, parents=True)
             with open(output_path, "wb") as f:
